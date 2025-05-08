@@ -1,6 +1,8 @@
 // importo l array di oggetti dal file in data
 const posts = require('../data/posts')
 
+const connection = require('../data/db')
+
 // funzioni per ogni verbo delle route
 
 //funzione index
@@ -57,7 +59,7 @@ function store(req, res) {
     posts.push(newPost);
 
     console.log(posts);
-    
+
     res.status(201);
 
     res.json(newPost);
@@ -68,7 +70,7 @@ function update(req, res) {
 
     const id = parseInt(req.params.id)
 
-    const post = posts.find((element) => element.id=== id)
+    const post = posts.find((element) => element.id === id)
 
     if (!post) {
 
