@@ -22,16 +22,32 @@ function index(req, res) {
 
 //funzione show
 function show(req, res) {
-    //preparo query
-    const sql = 'SELECT * FROM `posts` WHERE id = ?'
 
     // recupero id dall URL
     const { id } = req.params
 
-    // eseguo query
-    connection.query(sql, [id], (err, results) => {
+    //preparo prima query
+    const postSql = 'SELECT * FROM `posts` WHERE id = ?'
+
+    //preparo seconda query
+    const tagSql = 'SELECT `tags`.`id`, `tags`.`label` FROM db_blog.posts JOIN `post_tag` ON `post_tag`.`post_id` = `posts`.`id` JOIN `tags` ON `post_tag`.`tag_id` = `tags`.`id` WHERE `post_id` = ?'
+
+    // eseguo prima query
+    connection.query(postSql, [id], (err, postResults) => {
         if (err) return res.status(500).json({ error: 'database query failed' })
-        res.json(results)
+        if (postResults.lenght === 0) return res.status(404).json({ error: 'post not found' })
+
+        // recupero il post
+        const post = postResults[0]
+
+        // se è andata a buon fine, eseguo la seconda query rimanendo all interno della prima
+        connection.query(tagSql, [id], (err, tagResults) => {
+            if (err) return res.status(500).json({ error: 'database query failed' })
+
+            // aggiungo tag al post
+            post.tags = tagResults
+            res.json(post)
+        })
     })
 
 }
