@@ -1,6 +1,7 @@
 // importo l array di oggetti dal file in data
 const posts = require('../data/posts')
 
+// !!! importo file di connessione al database
 const connection = require('../data/db')
 
 // funzioni per ogni verbo delle route
@@ -8,21 +9,15 @@ const connection = require('../data/db')
 //funzione index
 function index(req, res) {
 
-    let filterTag = posts
+    //preparo query
+    const sql = 'SELECT * FROM `posts`'
 
-    if (req.query.tag) {
-        filterTag = posts.filter(element => element.tags.includes(req.query.tag))
-    }
+    // eseguo query
+    connection.query(sql, (err, results) => {
+        if (err) return res.status(500).json({ error: 'database query failed' })
+        res.json(results)
+    })
 
-    if (filterTag.length <= 0) {
-        res.status(404)
-
-        return res.json({
-            error: "not found",
-            message: "tag del post non trovato"
-        })
-    }
-    res.json(filterTag)
 }
 
 //funzione show
