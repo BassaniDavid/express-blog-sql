@@ -22,20 +22,18 @@ function index(req, res) {
 
 //funzione show
 function show(req, res) {
+    //preparo query
+    const sql = 'SELECT * FROM `posts` WHERE id = ?'
 
-    const post = posts.find((element) => element.title === req.params.id)
+    // recupero id dall URL
+    const { id } = req.params
 
-    if (!post) {
+    // eseguo query
+    connection.query(sql, [id], (err, results) => {
+        if (err) return res.status(500).json({ error: 'database query failed' })
+        res.json(results)
+    })
 
-        res.status(404)
-
-        return res.json({
-            error: "not found",
-            message: "post non trovato"
-        })
-    }
-
-    res.json(post)
 }
 
 //funzione store
