@@ -94,23 +94,15 @@ function modify(req, res) {
 
 //funzione destroy
 function destroy(req, res) {
-    const post = posts.find((element) => element.title === req.params.id)
 
-    if (!post) {
+    // recupero id dall URL
+    const { id } = req.params
 
-        res.status(404)
-
-        return res.json({
-            error: "not found",
-            message: "post non trovato"
-        })
-    }
-
-    posts.splice(posts.indexOf(post), 1)
-
-    console.log(posts)
-
-    res.sendStatus(204)
+    // elimino blog corrispondente
+    connection.query('DELETE FROM `posts` WHERE id = ?', [id], (err) => {
+        if (err) return res.status(500).json({ error: 'failed to delete post' })
+        res.sendStatus(204)
+    })
 }
 
 // esporto le funzioni, che importo in router
